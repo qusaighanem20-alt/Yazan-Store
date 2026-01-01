@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAZAN STORE</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #2c3e50;
+            --bg-color: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: rgb(229, 227, 227);
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border: 2px solid var(--accent-color);
+        }
+
+        #products-page {
+            display: none;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .product-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .product-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-item h3 { margin: 10px 0; font-size: 1.1em; }
+        .product-item p { color: var(--accent-color); font-weight: bold; }
+
+        .add-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-section {
+            margin-top: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .total-price {
+            font-size: 1.5em;
+            color: #c0392b;
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .back-btn {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+   <p>خيارك الأفضل</p>
+    <h1>YAZAN STORE</h1>
+    <p>للتواصل</p>
+     <h3> 0780096718 </h3>
+</header>
+
+<div id="home-page" class="categories-grid">
+    <div class="category-card" onclick="showCategory('شيبس')">
+        <h2>شيبس</h2>
+        <p>اضغط لعرض الشركات</p>
+    </div>
+
+    <div class="category-card" onclick="showCategory('مشروبات')">
+        <h2>مشروبات</h2>
+        <p>اضغط لعرض الشركات</p>
+    </div>
+
+    <div class="category-card" onclick="showCategory('بسكويت')">
+        <h2>بسكويت</h2>
+        <p>اضغط لعرض الشركات</p>
+    </div>
+
+    <div class="category-card" onclick="showCategory('كيك')">
+        <h2>كيك</h2>
+        <p>اضغط لعرض الشركات</p>
+    </div>
+
+    <div class="category-card" onclick="showCategory('سكاكر & كاندي')">
+        <h2>سكاكر & كاندي</h2>
+        <p>اضغط لعرض الشركات</p>
+    </div>
+
+    <div class="category-card" onclick="showCategory('شوكولاته')">
+        <h2>شوكولاته</h2>
+        <p>اضغط لعرض الشركات</p>
+    </div>
+</div>
+
+<div id="products-page">
+    <button class="back-btn" onclick="goHome()">⬅ عوده للخلف</button>
+    <h2 id="category-title"></h2>
+    <div id="items-container" class="products-grid"></div>
+</div>
+
+<div class="cart-section">
+    <h2>🛒 سلة المشتريات (عرض السعر)</h2>
+    <div id="cart-items">
+        <p>السلة فارغة حالياً..</p>
+    </div>
+    <div class="total-price">
+        الإجمالي: <span id="total-amount">0</span> د.أ
+    </div>
+</div>
+
+<script>
+    const data = {
+        "شيبس": [
+            { name: "ليز", isCompany: true },
+            { name: "دوريتوس", isCompany: true },
+            { name: "برنجلز", isCompany: true },
+            { name: "مستر شيبس", isCompany: true },
+            { name: "لانش بوكس", isCompany: true },
+            { name: "بوكس", isCompany: true },
+            { name: "نست", isCompany: true },
+            { name: "هلا", isCompany: true },
+            { name: "دندنه", isCompany: true },
+            { name: "شيبس مولتو", isCompany: true },
+            { name: "مستر انجوي", isCompany: true },
+            { name: "بيكر", isCompany: true },
+            { name: "مشكل", isCompany: true },
+            { name: "ليون", isCompany: true },
+            { name: "STIX", isCompany: true }
+        ],
+        "ليز": [
+            { name: "ليز جبنة", price: 1.75, img: "ll.jpeg" },
+            { name: "ليز بالملح", price: 1.75, img: "yy.jpeg" },
+            { name: "ليز بالكاتشب", price: 1.75, img: "yh.jpeg" },
+            { name: "ليز ملح وخل", price: 1.75, img: "yyyy.jpeg" },
+            { name: "ليز فلفل حار", price: 1.75, img: "yyy.jpeg" }
+        ],
+        "دوريتوس": [
+            { name: "دوريتوس حار نار", price: 1.80, img: "rrr.jpeg" },
+            { name: "دوريتوس حلو", price: 1.80, img: "rr.jpeg" },
+            { name: "دوريتوس جبنه", price: 1.80, img: "jj.jpeg" }
+        ],
+        "برنجلز": [
+            { name: "اوجينال", price: 6.30, img: "red.jpeg" },
+            { name: "بابريكا", price: 6.30, img: "bab.jpeg" },
+            { name: "كاتشاب", price: 6.30, img: "blw.jpeg" },
+            { name: "مشاوي", price: 6.30, img: "msh.jpeg" },
+            { name: "باربيكيو", price: 6.30, img: "brb.jpeg" },
+            { name: "ملح وخل", price: 6.30, img: "wbl.jpeg" },
+            { name: "جبنة", price: 6.30, img: "v.jpeg" },
+            { name: "بصل", price: 6.30, img: "green.jpeg" }
+        ],
+        "مستر شيبس": [
+            { name: "", price: 1.75, img: "كاتشاب.jpeg" },
+            { name: "", price: 1.75, img: "حار.jpeg" },
+            { name: "", price: 1.75, img: "جبن.jpeg" },
+            { name: "", price: 1.75, img: "ملح.jpeg" },
+            { name: "", price: 1.75, img: "خل.jpeg" },
+            { name: "", price: 1.75, img: "باب.jpeg" },
+            { name: "", price: 5.75, img: "فلافل.jpeg" },
+            { name: "", price: 5.00, img: "بيق.jpeg" },
+            { name: "", price: 7.70, img: "سناك.jpeg" },
+            { name: "", price: 7.75, img: "بوشار.jpeg" },
+            { name: "", price: 1.80, img: "تمساح.jpeg" },
+            { name: "", price: 1.80, img: "بيتزا.jpeg" }
+        ],
+        "لانش بوكس": [
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" }
+        ],
+
+        "بوكس": [
+            { name: "", price: 5.50, img: ".jpg" },
+            { name: "", price: 5.50, img: ".jpg" },
+            { name: "", price: 5.50, img: ".jpg" },
+            { name: "", price: 5.50, img: ".jpg" },
+            { name: "", price: 5.50, img: ".jpg" }
+        ],
+
+        "نست": [
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" },
+            { name: "", price: 6.25, img: ".jpg" }
+        ],
+        "هلا": [
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 4.25, img: ".jpg" },
+            { name: "", price: 4.25, img: ".jpg" },
+            { name: "", price: 4.25, img: ".jpg" },
+
+        ],
+
+        "دندنه": [
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" }
+            
+        ],
+
+        "شيبس مولتو": [
+            { name: "", price: 5.00, img: ".jpg" },
+            { name: "", price: 5.00, img: ".jpg" },
+            { name: "", price: 5.00, img: ".jpg" },
+            { name: "", price: 5.00, img: ".jpg" },
+            { name: "", price: 5.00, img: ".jpg" }
+        ],
+        "مستر انجوي": [
+            { name: "", price: 6.45, img: ".jpg" },
+            { name: "", price: 6.45, img: ".jpg" }
+        ],
+
+        "بيكر": [
+            { name: "", price: 3.80, img: ".jpg" },
+        ],
+
+        "مشكل": [
+            { name: "", price: 4.90, img: ".jpg" },
+            { name: "", price: 3.60, img: ".jpg" },
+            { name: "", price: 3.80, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 4.75, img: ".jpg" },
+            { name: "", price: 1.75, img: ".jpg" },
+            { name: "", price: 3.75, img: ".jpg" },
+            { name: "", price: 1.80, img: ".jpg" },
+            { name: "", price: 1.80, img: ".jpg" }
+        ],
+        "ليون": [
+            { name: "", price: 4.00, img: ".jpg" }
+        ],
+
+        "STIX": [
+            { name: "", price: 1.90, img: ".jpg" },
+            { name: "", price: 1.90, img: ".jpg" },
+            { name: "", price: 1.90, img: ".jpg" },
+            { name: "", price: 1.90, img: ".jpg" },
+            { name: "", price: 1.90, img: ".jpg" }
+        ],
+
+        "مشروبات": [
+
+        { name: "جوردينا", isCompany: true },
+        { name: "دانس", isCompany: true },
+        { name: "راني", isCompany: true },
+        { name: "سن توب", isCompany: true },
+        { name: "ايس كوفي", isCompany: true },
+        { name: "ڤيمتو", isCompany: true },
+        { name: "سيزر", isCompany: true },
+        { name: "ميزو", isCompany: true },
+        { name: "باربيكان", isCompany: true },
+        { name: "بي ام", isCompany: true },
+        { name: "بوم بوم", isCompany: true },
+        { name: "رد اند بلو", isCompany: true },
+        { name: "رد بول", isCompany: true },
+        { name: "راز", isCompany: true },
+        { name: "كنزا", isCompany: true },
+        { name: "ماتركس", isCompany: true },
+        { name: "سوبر", isCompany: true },
+        { name: "كناري", isCompany: true },
+        { name: "ريتا", isCompany: true },
+        { name: "big", isCompany: true }
+
+    ],
+
+    "جوردينا": [
+        { name: "", price: 1.90, img: "lays1.jpg" },
+        { name: "", price: 1.90, img: "lays2.jpg" }
+    ],
+    "دانس": [
+        { name: "", price: 1.30, img: "dor.jpg" }
+    ],
+    "راني": [
+        { name: "", price: 4.60, img: "lays1.jpg" },
+    ],
+    "سن توب": [
+        { name: "", price: 3.70, img: "dor.jpg" },
+        { name: "", price: 5.85, img: "dor.jpg" },
+        { name: "", price: 9.00, img: "dor.jpg" }
+    ],
+    "ايس كوفي": [
+        { name: "", price: 11.10, img: "lays1.jpg" },
+    ],
+
+    "ڤيمتو": [
+
+        { name: "", price: 4.75, img: "dor.jpg" },
+        { name: "", price: 7.20, img: "dor.jpg" },
+        { name: "", price: 8.50, img: "dor.jpg" },
+
+    ],
+    "سيزر": [
+
+        { name: "", price: 11.85, img: "dor.jpg" }
+
+    ],
+
+    "ميزو": [
+        { name: "", price: 6.00, img: "lays1.jpg" },
+    ],
+
+    "باربيكان": [
+        { name: "", price: 11.15, img: "dor.jpg" },
+        { name: "", price: 7.00, img: "dor.jpg" },
+    ],
+
+    "بي ام": [
+        { name: "", price: 9.00, img: "lays1.jpg" },
+        { name: "", price: 6.00, img: "lays2.jpg" }
+    ],
+
+    "بوم بوم": [
+        { name: "", price: 14.50, img: "dor.jpg" }
+    ],
+
+    "رد اند بلو": [
+        { name: "", price: 10.25, img: "lays1.jpg" },
+        { name: "", price: 6.25, img: "lays2.jpg" }
+    ],
+
+    "رد بول": [
+        { name: "", price: 28.50, img: "dor.jpg" }
+    ],
+
+    "راز": [
+        { name: "", price: 5.00, img: "lays1.jpg" },
+    ],
+
+    "كنزا": [
+        { name: "", price: 5.75, img: "lays1.jpg" },
+        { name: "", price: 5.75, img: "lays2.jpg" }
+    ],
+
+    "ماتركس": [
+        { name: "", price: 4.25, img: "dor.jpg" },
+        { name: "", price: 4.45, img: "dor.jpg" },
+        { name: "", price: 5.15, img: "dor.jpg" }
+    ],
+
+    "سوبر": [
+        { name: "", price: 6.50, img: "lays1.jpg" }
+    ],
+
+    "كناري": [
+        { name: "", price: 6.30, img: "dor.jpg" }
+    ],
+
+    "ريتا": [
+        { name: "", price: 7.5, img: "lays1.jpg" },
+    ],
+
+    "big": [
+        { name: "", price: 1.85, img: "dor.jpg" },
+    ],
+
+    "بسكويت": [
+
+        { name: "ويفر تورين", isCompany: 1 },
+        { name: "Tiffany", isCompany: true },
+        { name: "معمول", isCompany: true },
+        { name: "بسكويت مشكل", isCompany: true },
+        { name: "شوفان", isCompany: true },
+        { name: "ويفر", isCompany: true },
+        { name: "مغطس شوكلا", isCompany: true },
+        { name: "محشو", isCompany: true },
+        { name: "محشي جوز الهند", isCompany: true },
+        { name: "الفاخر", isCompany: true },
+        { name: "بیسکریم", isCompany: true },
+        { name: "كومبو", isCompany: true },
+        { name: "ويفر دب", isCompany: true },
+        { name: "وایف اب", isCompany: true },
+        { name: "oh boy", isCompany: true },
+        { name: "اتش اند ار", isCompany: true },
+        { name: "ایسبرج", isCompany: true },
+        { name: "رول محشي", isCompany: true },
+        { name: "شكلوب جوك", isCompany: true },
+        { name: "ياسمين", isCompany: true },
+        { name: "كناري", isCompany: true },
+        { name: "مشکل", isCompany: true },
+        { name: "تك تاك", isCompany: true },
+        { name: "اوریو", isCompany: true }
+
+    ],
+
+    "ويفر تورين": [
+        { name: "", price: 5.00, img: ".jpg" },
+        { name: "", price: 5.00, img: ".jpg" },
+        { name: "", price: 5.00, img: ".jpg" },
+        { name: "", price: 5.00, img: ".jpg" },
+        { name: "", price: 5.00, img: ".jpg" },
+    ],
+
+    "Tiffany": [
+        { name: "", price: 1.80, img: ".jpg" },
+        { name: "", price: 1.80, img: ".jpg" }
+    ],
+
+    "معمول": [
+        { name: "", price: 2.00, img: ".jpg" },
+        { name: "", price: 1.80, img: ".jpg" },
+        { name: "", price: 0.90, img: ".jpg" },
+        { name: "", price: 1.60, img: ".jpg" },
+        { name: "", price: 2.25, img: ".jpg" },
+        
+    ],
+
+    "بسكويت مشكل": [
+        { name: "", price: 0.90, img: ".jpg" },
+        { name: "", price: 1.90, img: ".jpg" },
+        { name: "", price: 5.10, img: ".jpg" },
+        { name: "", price: 0.95, img: ".jpg" },
+        { name: "", price: 2.15, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 6.25, img: ".jpg" },
+        { name: "", price: 3.75, img: ".jpg" },
+    ],
+    "شوفان": [
+        { name: "", price: 0.95, img: ".jpg" },
+    ],
+
+    "ويفر": [
+        { name: "", price: 5.20, img: ".jpg" },
+        { name: "", price: 1.95, img: ".jpg" },
+        { name: "", price: 5.00, img: ".jpg" },
+        { name: "", price: 1.75, img: ".jpg" },
+        { name: "", price: 1.75, img: ".jpg" }
+    ],
+
+    "مغطس شوكلا": [
+        { name: "", price: 6.90, img: ".jpg" },
+        { name: "", price: 1.95, img: ".jpg" },
+        { name: "", price: 1.80, img: ".jpg" },
+        { name: "", price: 1.80, img: ".jpg" },
+        { name: "", price: 1.80, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.95, img: ".jpg" }
+    ],
+
+    "محشو": [
+        { name: "", price: 1.75, img: ".jpg" },
+        { name: "", price: 1.80, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" }
+    ],
+
+    "محشي جوز الهند": [
+        { name: "", price: 1.85, img: ".jpg" },
+    ],
+
+    "الفاخر": [
+        { name: "", price: 1.75, img: ".jpg" }
+    ],
+
+    "بیسکریم": [
+        { name: "", price: 5.30, img: ".jpg" },
+        { name: "", price: 7.30, img: ".jpg" }
+    ],
+
+    "كومبو": [
+        { name: "", price: 7.90, img: ".jpg" }
+    ],
+    "ويفر دب": [
+        { name: "", price: 1.75, img: ".jpg" }
+    ],
+
+    "وایف اب": [
+        { name: "", price: 4.45, img: ".jpg" }
+    ],
+
+    "oh boy": [
+        { name: "", price: 1.90, img: ".jpg" }
+    ],
+
+    "اتش اند ار": [
+        { name: "", price: 1.90, img: ".jpg" },
+    ],
+
+    "ایسبرج": [
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.50, img: ".jpg" },
+        { name: "", price: 1.50, img: ".jpg" },
+    ],
+   
+    "رول محشي": [
+        { name: "", price: 1.75, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" }
+    ],
+
+    "شكلوب جوك": [
+        { name: "", price: 6.00, img: ".jpg" }
+    ],
+
+    "ياسمين": [
+        { name: "", price: 1.50, img: ".jpg" },
+        { name: "", price: 3.25, img: ".jpg" }
+    ],
+
+    "كناري": [
+        { name: "", price: 2.85, img: ".jpg" },
+        { name: "", price: 5.50, img: ".jpg" }
+    ],
+    "مشکل": [
+        { name: "", price: 1.95, img: ".jpg" },
+    ],
+
+    "تك تاك": [
+        { name: "", price: 0.90, img: ".jpg" }
+    ],
+
+    "اوریو": [
+        { name: "", price: 4.60, img: ".jpg" },
+    ],
+"كيك": [
+
+        { name: "جوردينا كيك ", isCompany: 1 },
+        { name: "لوزين", isCompany: true },
+        { name: "ديمه", isCompany: true },
+        { name: "الياسمين", isCompany: true },
+        { name: "تونكيز", isCompany: true },
+        { name: "مشكل", isCompany: true },
+        { name: "مولتو", isCompany: true }
+
+    ],
+
+    "جوردينا كيك ": [
+        { name: "", price: 2.90, img: ".jpg" },
+        { name: "", price: 0.98, img: ".jpg" },
+        { name: "", price: 0.98, img: ".jpg" },
+        { name: "", price: 0.98, img: ".jpg" },
+        { name: "", price: 0.98, img: ".jpg" },
+        { name: "", price: 0.98, img: ".jpg" },
+    ],
+
+    "لوزين": [
+        { name: "", price: 1.70, img: ".jpg" }
+    ],
+
+    "ديمه": [
+        { name: "", price: 1.95, img: ".jpg" },
+        { name: "", price: 0.95, img: ".jpg" }
+    ],
+
+    "الياسمين": [
+        { name: "", price: 1.95, img: ".jpg" },
+        { name: "", price: 0.95, img: ".jpg" }
+    ],
+
+    "تونكيز": [
+        { name: "", price: 0.90, img: ".jpg" }
+    ],
+
+    "مشكل": [
+        { name: "", price: 0.95, img: ".jpg" }
+    ],
+
+    "مولتو": [
+        { name: "", price: 5.10, img: ".jpg" },
+        { name: "", price: 5.25, img: ".jpg" },
+        { name: "", price: 3.60, img: ".jpg" }
+    ],
+    "سكاكر & كاندي": [
+
+        { name: "مونتس", isCompany: true },
+        { name: "اكسترا", isCompany: true },
+        { name: "سوس فيدال", isCompany: true },
+        { name: "مارشميلو", isCompany: true },
+        { name: "علكة اكسلنت", isCompany: true },
+        { name: "علكة sb", isCompany: true },
+        { name: "سكاكر ايس", isCompany: true },
+        { name: "الفارس", isCompany: true },
+        { name: "العقاب", isCompany: true },
+        { name: "هولز", isCompany: true },
+        { name: "مصاص", isCompany: true },
+        { name: "علكة BR", isCompany: true },
+        { name: "حلو فريغلز", isCompany: true },
+        { name: "سوس", isCompany: true },
+        { name: "شعيريه", isCompany: true },
+
+    ],
+
+    "مونتس": [
+        { name: "", price: 4.40, img: ".jpg" },
+    ],
+
+    "اكسترا": [
+        { name: "", price: 10.00, img: ".jpg" },
+        { name: "", price: 1.25, img: ".jpg" },
+    ],
+
+    "سوس فيدال": [
+        { name: "", price: 6.50, img: ".jpg" },
+        { name: "", price: 4.50, img: ".jpg" }
+    ],
+
+    "مارشميلو": [
+        { name: "", price: 0.90, img: ".jpg" },
+    ],
+
+    "علكة اكسلنت": [
+        { name: "", price: 6.20, img: ".jpg" },
+        { name: "", price: 5.00, img: ".jpg" }
+    ],
+
+    "علكة sb": [
+        { name: "", price: 0.75, img: ".jpg" },
+        { name: "", price: 0.75, img: ".jpg" }
+    ],
+
+    "سكاكر ايس": [
+        { name: "", price: 1.25, img: ".jpg" },
+        { name: "", price: 1.60, img: ".jpg" }
+    ],
+
+    "الفارس": [
+        { name: "", price: 0.39, img: ".jpg" },
+        { name: "", price: 0.80, img: ".jpg" }
+    ],
+
+    "العقاب": [
+        { name: "", price: 1.90, img: ".jpg" },
+        { name: "", price: 1.90, img: ".jpg" }
+    ],
+
+    "هولز": [
+        { name: "", price: 3.75, img: ".jpg" },
+    ],
+
+    "مصاص": [
+        { name: "", price: 1.75, img: ".jpg" },
+        { name: "", price: 5.00, img: ".jpg" }
+    ],
+
+    "علكة BR": [
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" }
+    ],
+
+    "حلو فريغلز": [
+        { name: "", price: 1.20, img: ".jpg" }
+    ],
+
+    "سوس": [
+        { name: "", price: 2.00, img: ".jpg" },
+        { name: "", price: 3.50, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.75, img: ".jpg" }
+    ],
+
+    "شعيريه": [
+        { name: "", price: 1.25, img: ".jpg" },
+        { name: "", price: 1.70, img: ".jpg" }
+    ],
+
+    "شوكولاته": [
+
+        { name: "نوتيلا", isCompany: true },
+        { name: "فيريرو", isCompany: true },
+        { name: "کیندر", isCompany: true },
+        { name: "تویکس", isCompany: true },
+        { name: "باونتي & جلكسي", isCompany: true },
+        { name: "سنكرز & مارس", isCompany: true },
+        { name: "مالتیزرز و M&Ms", isCompany: true },
+        { name: "شوكو بريك", isCompany: true },
+        { name: "بريك", isCompany: true },
+        { name: "بالو بالو & يمي", isCompany: true },
+        { name: "ديري ميلك", isCompany: true },
+        { name: "ادور", isCompany: true },
+        { name: "ببلي", isCompany: true },
+        { name: "زیدان", isCompany: true },
+        { name: " تو داي", isCompany: true },
+        { name: "توفي", isCompany: true },
+        { name: "فيوري", isCompany: true },
+        { name: "مشکل", isCompany: true },
+        { name: "توفي لك", isCompany: true },
+
+    ],
+
+    "نوتيلا": [
+        { name: "", price: 15.50, img: ".jpg" },
+        { name: "", price: 2.15, img: ".jpg" }
+    ],
+
+    "فيريرو": [
+        { name: "", price: 14.25, img: ".jpg" }
+    ],
+
+    "کیندر": [
+        { name: "", price: 18.50, img: ".jpg" },
+        { name: "", price: 8.50, img: ".jpg" },
+        { name: "", price: 11.00, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 6.10, img: ".jpg" },
+        { name: "", price: 3.50, img: ".jpg" },
+    ],
+
+    "تویکس": [
+        { name: "", price: 10.00, img: ".jpg" },
+        { name: "", price: 5.25, img: ".jpg" },
+        { name: "", price: 3.10, img: ".jpg" }
+    ],
+
+    "باونتي & جلكسي": [
+        { name: "", price: 7.40, img: ".jpg" },
+        { name: "", price: 3.10, img: ".jpg" },
+        { name: "", price: 6.35, img: ".jpg" },
+        { name: "", price: 3.10, img: ".jpg" }
+    ],
+
+    "سنكرز & مارس": [
+        { name: "", price: 9.50, img: ".jpg" },
+        { name: "", price: 6.35, img: ".jpg" },
+        { name: "", price: 6.10, img: ".jpg" },
+        { name: "", price: 10.25, img: ".jpg" },
+        { name: "", price: 6.10, img: ".jpg" }
+    ],
+
+    "مالتیزرز و M&Ms": [
+        { name: "", price: 14.40, img: ".jpg" },
+        { name: "2", price: 14.00, img: ".jpg" }
+    ],
+
+    "شوكو بريك": [
+        { name: "", price: 3.45, img: ".jpg" }
+    ],
+
+    "بريك": [
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.85, img: ".jpg" },
+        { name: "", price: 1.95, img: ".jpg" },
+        { name: "", price: 1.95, img: ".jpg" }
+    ],
+
+    "بالو بالو & يمي": [
+        { name: "", price: 1.65, img: ".jpg" },
+        { name: "", price: 1.70, img: ".jpg" }
+    ],
+
+    "ديري ميلك": [
+        { name: "", price: 1.85, img: ".jpg" }
+    ],
+
+    "ادور": [
+        { name: "", price: 1.95, img: ".jpg" }
+    ],
+
+    "ببلي": [
+        { name: "", price: 3.25, img: ".jpg" },
+    ],
+
+    "زیدان": [
+        { name: "", price: 2.90, img: ".jpg" }
+    ],
+
+    " تو داي": [
+        { name: "", price: 0.85, img: ".jpg" },
+        { name: "", price: 1.25, img: ".jpg" }
+    ],
+
+    "توفي": [
+        { name: "", price: 1.60, img: ".jpg" }
+    ],
+    "فيوري": [
+        { name: "", price: 1.90, img: ".jpg" }
+    ],
+
+    "مشکل": [
+        { name: "", price: 1.90, img: ".jpg" },
+        { name: "", price: 1.95, img: ".jpg" },
+        { name: "", price: 1.10, img: ".jpg" },
+        { name: "", price: 0.90, img: ".jpg" }
+    ],
+
+    "توفي لك": [
+        { name: "", price: 1.85, img: ".jpg" }
+    ],
+
+    };
+
+    let cart = [];
+    let lastCategory = "";
+
+    function addToCart(name, price) {
+        cart.push({ name: name, price: price });
+        updateCartUI();
+    }
+
+    function showCategory(catName) {
+        const titleElement = document.getElementById('category-title');
+        const currentTitle = titleElement.innerText;
+
+        const mainSections = ["شيبس", "مشروبات", "بسكويت", "كيك", "سكاكر & كاندي", "شوكولاته"];
+        
+        if (mainSections.includes(catName)) {
+            lastCategory = "";
+        } else if (mainSections.includes(currentTitle)) {
+            lastCategory = currentTitle;
+        }
+
+        document.getElementById('home-page').style.display = 'none';
+        document.getElementById('products-page').style.display = 'block';
+        titleElement.innerText = catName;
+        
+        const container = document.getElementById('items-container');
+        container.innerHTML = '';
+
+        if (!data[catName]) {
+            container.innerHTML = '<p>سيتم إضافة المنتجات قريباً..</p>';
+            return;
+        }
+
+        data[catName].forEach(item => {
+            if (item.isCompany) {
+                container.innerHTML += `
+                    <div class="category-card" style="border: 2px solid #e67e22; background: #fff5eb;" onclick="showCategory('${item.name}')">
+                        <h3>${item.name}</h3>
+                        <p>اضغط لعرض الأنواع</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML += `
+                    <div class="product-item">
+                        <img src="${item.img}" alt="${item.name}">
+                        <h3>${item.name}</h3>
+                        <p>السعر: ${item.price} د.أ</p>
+                        <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">إضافة للسلة</button>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    function goHome() {
+        const title = document.getElementById('category-title').innerText;
+
+        if (lastCategory !== "") {
+            let temp = lastCategory;
+            lastCategory = "";
+            showCategory(temp);
+        } else {
+            document.getElementById('home-page').style.display = 'grid';
+            document.getElementById('products-page').style.display = 'none';
+            document.getElementById('category-title').innerText = "";
+        }
+    }
+
+    function updateCartUI() {
+        const cartDiv = document.getElementById('cart-items');
+        const totalSpan = document.getElementById('total-amount');
+        
+        if (cart.length === 0) {
+            cartDiv.innerHTML = '<p>السلة فارغة حالياً..</p>';
+            totalSpan.innerText = '0';
+            return;
+        }
+
+        cartDiv.innerHTML = '';
+        let currentTotal = 0;
+        
+        cart.forEach((item, index) => {
+            currentTotal += item.price;
+            cartDiv.innerHTML += `
+                <div class="cart-item">
+                    <span>${item.name}</span>
+                    <div>
+                        <span>${item.price.toFixed(2)} د.أ</span>
+                        <button onclick="removeFromCart(${index})" style="margin-right:10px; color:red; border:none; background:none; cursor:pointer;">❌</button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        totalSpan.innerText = currentTotal.toFixed(2);
+    }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCartUI();
+    }
+</script>
+
+</body>
+</html>
