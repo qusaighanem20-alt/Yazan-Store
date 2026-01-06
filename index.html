@@ -158,6 +158,11 @@
         <h2>شوكولاته</h2>
         <p>اضغط لعرض الشركات</p>
     </div>
+
+     <div class="category-card" onclick="showCategory('اندومي')">
+        <h2>اندومي</h2>
+        <p>اضغط لعرض الشركات</p>
+    </div>
 </div>
 
 <div id="products-page">
@@ -875,6 +880,20 @@
     "توفي لك": [
         { name: "", price: 1.85, img: ".jpg" }
     ],
+    "اندومي": [
+
+        { name: "اندومي كاسات", isCompany: 1 },
+        { name: "اندومي كياس", isCompany: true }
+
+    ],
+
+    "اندومي كاسات": [
+        { name: "اندومي كاسات", price: 2.90, img: ".jpg" }
+    ],
+
+    "اندومي كياس": [
+        { name: "اندومي كياس", price: 1.70, img: ".jpg" }
+    ],
 
     };
 
@@ -890,7 +909,7 @@
         const titleElement = document.getElementById('category-title');
         const currentTitle = titleElement.innerText;
 
-        const mainSections = ["شيبس", "مشروبات", "بسكويت", "كيك", "سكاكر & كاندي", "شوكولاته"];
+        const mainSections = ["شيبس", "مشروبات", "بسكويت", "كيك", "سكاكر & كاندي", "شوكولاته","اندومي"];
         
         if (mainSections.includes(catName)) {
             lastCategory = "";
@@ -982,4 +1001,5 @@
 
 </body>
 </html>
+
 
